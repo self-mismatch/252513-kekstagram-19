@@ -751,6 +751,12 @@ main {
   border-radius: 5px;
 }
 
+.text__hashtags:invalid {
+  color: #ff4e4e;
+
+  border-color: #ff4e4e;
+}
+
 .text__description {
   width: 450px;
   height: 100px;
