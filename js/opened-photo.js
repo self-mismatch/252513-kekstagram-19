@@ -5,13 +5,29 @@
   var photosList = photosBlock.querySelectorAll('.picture');
 
   var openedPhoto = document.querySelector('.big-picture');
-  var openedPhotoCancel = openedPhoto.querySelector('.big-picture__cancel')
+  var openedPhotoCancel = openedPhoto.querySelector('.big-picture__cancel');
   var openedPhotoImg = openedPhoto.querySelector('.big-picture__img img');
 
   var openedPhotoSocial = openedPhoto.querySelector('.big-picture__social');
   var openedPhotoCaption = openedPhotoSocial.querySelector('.social__caption');
   var openedPhotoLikes = openedPhotoSocial.querySelector('.likes-count');
   var openedPhotoComments = openedPhotoSocial.querySelector('.social__comments');
+
+  var commentTemplate = openedPhotoComments.querySelector('.social__comment');
+
+  // Возвращает комментарий с параметрами, заданными в передающемся элементе массива с фотографиями
+  function createComment(photo, index) {
+    var comment = commentTemplate.cloneNode(true);
+
+    var picture = comment.querySelector('.social__picture');
+    var commentContent = comment.querySelector('.social__text');
+
+    picture.src = photo.comments[index].avatar;
+    picture.alt = photo.comments[index].name;
+    commentContent.textContent = photo.comments[index].message;
+
+    return comment;
+  }
 
   function onPhotoClick(evt) {
     if (evt.target.classList.contains('picture__img') || evt.target.classList.contains('picture')) {
@@ -62,7 +78,7 @@
         var fragment = document.createDocumentFragment();
 
         for (var j = 0; j < window.photos[i].comments.length; j++) {
-          fragment.appendChild(window.createComment(window.photos[i], j));
+          fragment.appendChild(createComment(window.photos[i], j));
         }
 
         openedPhotoComments.appendChild(fragment);

@@ -104,36 +104,20 @@ picturesList.appendChild(fragment);
 
 var bigPicture = document.querySelector('.big-picture');
 
-var bigPictureimg = bigPicture.querySelector('.big-picture__img');
-var bigPictureCaption = bigPicture.querySelector('.social__caption');
-var bigPictureLikesCount = bigPicture.querySelector('.likes-count');
-var bigPictureCommentsCount = bigPicture.querySelector('.comments-count');
-var bigPictureCommentsBlock = bigPicture.querySelector('.social__comments');
+// var bigPictureimg = bigPicture.querySelector('.big-picture__img');
+// var bigPictureCaption = bigPicture.querySelector('.social__caption');
+// var bigPictureLikesCount = bigPicture.querySelector('.likes-count');
+// var bigPictureCommentsCount = bigPicture.querySelector('.comments-count');
 
-var commentTemplate = bigPictureCommentsBlock.querySelector('.social__comment');
-
-// Возвращает комментарий с параметрами, заданными в передающемся элементе массива с фотографиями
-function createComment(photo, index) {
-  var comment = commentTemplate.cloneNode(true);
-
-  var picture = comment.querySelector('.social__picture');
-  var commentContent = comment.querySelector('.social__text');
-
-  picture.src = photo.comments[index].avatar;
-  picture.alt = photo.comments[index].name;
-  commentContent.textContent = photo.comments[index].message;
-
-  return comment;
-}
 
 // Выводит на экран открытое фото с комментариями
-function renderOpenedPhoto(photo) {
-  bigPictureimg.src = photo.url;
-  bigPictureCaption.textContent = photo.description;
-  bigPictureLikesCount.textContent = photo.likes;
-  bigPictureCommentsCount.textContent = photo.comments.length;
-  bigPictureCommentsBlock.appendChild(createComment(photo, 0));
-}
+// function renderOpenedPhoto(photo) {
+//   bigPictureimg.src = photo.url;
+//   bigPictureCaption.textContent = photo.description;
+//   bigPictureLikesCount.textContent = photo.likes;
+//   bigPictureCommentsCount.textContent = photo.comments.length;
+//   bigPictureCommentsBlock.appendChild(createComment(photo, 0));
+// }
 
 // renderOpenedPhoto(photos[0]);
 
