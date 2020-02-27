@@ -605,10 +605,6 @@ main {
   background-color: #ffe753;
   border-radius: 50%;
 
-  -webkit-transform: translateX(-50%);
-      -ms-transform: translateX(-50%);
-          transform: translateX(-50%);
-
   cursor: move;
 }
 

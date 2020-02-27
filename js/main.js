@@ -56,7 +56,7 @@ function getRandomComments(amount) {
 function getRandomPhoto() {
   var photo = {};
 
-  photo.url = getRandomUrl('photos/', 'jpg', 1, 6, '');
+  photo.url = getRandomUrl('photos/', 'jpg', 1, 25, '');
   photo.description = getRandomDescription();
   photo.likes = getRandomAmountOfLikes();
   photo.comments = getRandomComments(getRandomNumber(1, 6));
@@ -104,38 +104,22 @@ picturesList.appendChild(fragment);
 
 var bigPicture = document.querySelector('.big-picture');
 
-var bigPictureimg = bigPicture.querySelector('.big-picture__img');
-var bigPictureCaption = bigPicture.querySelector('.social__caption');
-var bigPictureLikesCount = bigPicture.querySelector('.likes-count');
-var bigPictureCommentsCount = bigPicture.querySelector('.comments-count');
-var bigPictureCommentsBlock = bigPicture.querySelector('.social__comments');
+// var bigPictureimg = bigPicture.querySelector('.big-picture__img');
+// var bigPictureCaption = bigPicture.querySelector('.social__caption');
+// var bigPictureLikesCount = bigPicture.querySelector('.likes-count');
+// var bigPictureCommentsCount = bigPicture.querySelector('.comments-count');
 
-var commentTemplate = bigPictureCommentsBlock.querySelector('.social__comment');
-
-// Возвращает комментарий с параметрами, заданными в передающемся элементе массива с фотографиями
-function createComment(photo) {
-  var comment = commentTemplate.cloneNode(true);
-
-  var picture = comment.querySelector('.social__picture');
-  var commentContent = comment.querySelector('.social__text');
-
-  picture.src = photo.url;
-  picture.alt = photo.comments[0].name;
-  commentContent.textContent = photo.comments[0].message;
-
-  return comment;
-}
 
 // Выводит на экран открытое фото с комментариями
-function renderOpenedPhoto(photo) {
-  bigPictureimg.src = photo.url;
-  bigPictureCaption.textContent = photo.description;
-  bigPictureLikesCount.textContent = photo.likes;
-  bigPictureCommentsCount.textContent = photo.comments.length;
-  bigPictureCommentsBlock.appendChild(createComment(photo));
-}
+// function renderOpenedPhoto(photo) {
+//   bigPictureimg.src = photo.url;
+//   bigPictureCaption.textContent = photo.description;
+//   bigPictureLikesCount.textContent = photo.likes;
+//   bigPictureCommentsCount.textContent = photo.comments.length;
+//   bigPictureCommentsBlock.appendChild(createComment(photo, 0));
+// }
 
-renderOpenedPhoto(photos[0]);
+// renderOpenedPhoto(photos[0]);
 
 var commentsCount = bigPicture.querySelector('.social__comment-count');
 commentsCount.classList.add('hidden');
@@ -183,6 +167,9 @@ function openImgEditor() {
   imgComment.addEventListener('blur', onCommentBlur);
 
   uploadFile.removeEventListener('change', onImgUploadChange);
+
+  window.sliderWidth = document.querySelector('.effect-level__line').offsetWidth;
+  window.pinWidth = document.querySelector('.effect-level__pin').offsetWidth;
 }
 
 // Скрывает форму редактирования изображения и удаляет все обработчики внутренних элементов
@@ -319,95 +306,6 @@ function changeimgFilter(filter) {
 function onImgFilterChange(evt) {
   if (evt.target.classList.contains('effects__radio')) {
     changeimgFilter('effects__preview--' + evt.target.value);
-  }
-}
-
-
-var hashtagsInput = imgUploadText.querySelector('.text__hashtags');
-hashtagsInput.addEventListener('input', onHashtagsInput);
-
-var imgUploadSubmit = imgUploadForm.querySelector('.img-upload__submit');
-imgUploadSubmit.addEventListener('click', onUploadFormSubmit);
-
-function onUploadFormSubmit(evt) {
-  checkHashtagsValidity(evt);
-}
-
-function onHashtagsInput() {
-  resetHashtagsError();
-}
-
-var hashtags = [];
-
-function doHashtagsArray() {
-  hashtags = hashtagsInput.value.toLowerCase().split(' ');
-}
-
-// Проверяет наличие одинаковых элементов в массиве и, если находит, возвращает первый по прядку элемент
-function checkForSimilarElement(array) {
-  var length = array.length;
-  var result;
-
-  for (var i = 0; i < length - 1; i++) {
-
-    for (var j = i + 1; j < length; j++) {
-
-      if (array[i] === array[j]) {
-        result = array[i];
-        return result;
-      }
-    }
-  }
-
-  return result;
-}
-
-// Проверяет наличие символа "#" в начале хэштега
-function checkForHash() {
-  var isHash = true;
-
-  for (var i = 0; i < hashtags.length; i++) {
-    if (hashtags[i][0] !== '#') {
-      isHash = false;
-      break;
-    }
-  }
-
-  return isHash;
-}
-
-// Проверяет хеш-теги на соответствие разрешённому формату
-function checkWithPattern() {
-  var isValid = true;
-  var regex = new RegExp(/(?:\s|^)#[A-Za-zА-Яа-яЁё0-9]+(?:|$)/);
-
-  for (var i = 0; i < hashtags.length; i++) {
-    if (regex.test(hashtags[i]) !== true) {
-      isValid = false;
-      break;
-    }
-  }
-
-  return isValid;
-}
-
-// Удаляет состояние ошибки с поля ввода хеш-тегов
-function resetHashtagsError() {
-  if (!hashtagsInput.checkValidity()) {
-    hashtagsInput.setCustomValidity('');
-  }
-}
-
-function checkHashtagsValidity() {
-  doHashtagsArray();
-
-  if (hashtags.length > 5) {
-    hashtagsInput.setCustomValidity('Нельзя указать больше 5 хэш-тегов');
-  } else if (checkForSimilarElement() !== undefined) {
-    hashtagsInput.setCustomValidity('Хэш-теги не могут повторяться');
-  } else if (checkForHash() !== true) {
-    hashtagsInput.setCustomValidity('Хэш-теги должны начинаться с символа "#"');
-  } else if (checkWithPattern() !== true) {
-    hashtagsInput.setCustomValidity('Хэш-теги не могут состоять из одного символа "#", а также содержать пробелы, спецсимволы (@, $ и т.п.), символы пунктуации (тире, дефис, запятая и т.п.), эмодзи и т.д.');
+    window.activeFilter = evt.target.value;
   }
 }

@@ -1,62 +1,69 @@
 'use strict';
 
 (function () {
-  var effectSlider = document.querySelector('.img-upload__effect-level');
-  var effectSliderLine = effectSlider.querySelector('.effect-level__line');
-  var effectSliderDepth = effectSliderLine.querySelector('.effect-level__depth');
-  var effectSliderPin = effectSliderLine.querySelector('.effect-level__pin');
+  var imgUpload = document.querySelector('.img-upload__preview img');
 
-  var imgUploadPreview = document.querySelector('.img-upload__preview img');
-  var filters = document.querySelectorAll('.effects__radio');
-  var activeFilter = '';
-  var effectValue = 0;
+  var slider = document.querySelector('.effect-level__line');
+  var sliderValue = 100;
 
-  function onMouseDown(evt) {
-    evt.preventDefault();
+  var pin = slider.querySelector('.effect-level__pin');
 
-    for (var i = 0; i < filters.length; i++) {
-      if (filters[i].checked === true) {
-        activeFilter = filters[i].value;
-      }
+  var sliderLine = slider.querySelector('.effect-level__depth');
+
+  function changeFilterSaturation(value) {
+
+    switch (window.activeFilter) {
+      case 'chrome':
+        imgUpload.style.filter = 'grayscale(' + value + ')';
+        break;
+
+      case 'sepia':
+        imgUpload.style.filter = 'sepia(' + value + ')';
+        break;
+
+      case 'marvin':
+        imgUpload.style.filter = 'invert(' + value * 100 + '%)';
+        break;
+
+      case 'phobos':
+        imgUpload.style.filter = 'blur(' + value * 3 + 'px)';
+        break;
+
+      case 'heat':
+        imgUpload.style.filter = 'brightness(' + (value * 2 + 1) + ')';
+        break;
     }
+  }
 
-    var startXCoordinate = evt.clientX;
+  function onMouseDown(downEvt) {
+    downEvt.preventDefault();
+
+    var sliderWidth = window.sliderWidth;
+    var pinWidth = window.pinWidth;
+
+    var leftEdge = -pinWidth / 2;
+    var rightEdge = sliderWidth - pinWidth / 2;
+
+    var startX = downEvt.clientX;
+    var shiftX = startX - pin.getBoundingClientRect().left;
 
     function onMouseMove(moveEvt) {
       moveEvt.preventDefault();
 
-      var moveXCoordinate = startXCoordinate - moveEvt.clientX;
+      sliderValue = Math.round(pin.offsetLeft / (sliderWidth - pinWidth) * 100);
 
-      startXCoordinate = moveEvt.clientX;
+      var leftMove = moveEvt.clientX - shiftX - slider.getBoundingClientRect().left;
 
-      if (startXCoordinate > effectSliderLine.getBoundingClientRect().left && startXCoordinate < effectSliderLine.getBoundingClientRect().left + effectSliderLine.offsetWidth) {
-        effectSliderPin.style.left = (effectSliderPin.offsetLeft - moveXCoordinate) + 'px';
-        effectSliderDepth.style.width = effectSliderPin.offsetLeft + 'px';
+      if (leftMove <= leftEdge) {
+        leftMove = leftEdge;
+      } else if (leftMove >= rightEdge) {
+        leftMove = rightEdge;
       }
 
-      effectValue = effectSliderPin.offsetLeft / effectSliderLine.offsetWidth;
+      pin.style.left = leftMove + 'px';
+      sliderLine.style.width = leftMove + pinWidth / 2 + 'px';
 
-      switch (activeFilter) {
-        case 'chrome':
-          imgUploadPreview.style.filter = 'grayscale(' + effectValue + ')';
-          break;
-
-        case 'sepia':
-          imgUploadPreview.style.filter = 'sepia(' + effectValue + ')';
-          break;
-
-        case 'marvin':
-          imgUploadPreview.style.filter = 'invert(' + effectValue * 100 + '%)';
-          break;
-
-        case 'phobos':
-          imgUploadPreview.style.filter = 'blur(' + effectValue * 3 + 'px)';
-          break;
-
-        case 'heat':
-          imgUploadPreview.style.filter = 'brightness(' + (effectValue * 2 + 1) + ')';
-          break;
-      }
+      changeFilterSaturation(sliderValue / 100);
     }
 
     function onMouseUp(upEvt) {
@@ -70,5 +77,5 @@
     document.addEventListener('mouseup', onMouseUp);
   }
 
-  effectSliderPin.addEventListener('mousedown', onMouseDown);
+  pin.addEventListener('mousedown', onMouseDown);
 })();
