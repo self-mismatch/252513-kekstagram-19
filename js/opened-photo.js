@@ -76,15 +76,15 @@
     for (var i = 0; i < photosList.length; i++) {
 
       if (photosList[i] === currentPhoto.parentElement) {
-        openedPhotoCaption.textContent = window.photos[i].description;
-        openedPhotoLikes.textContent = window.photos[i].likes;
+        openedPhotoCaption.textContent = window.data.photos[i].description;
+        openedPhotoLikes.textContent = window.data.photos[i].likes;
 
         openedPhotoComments.innerHTML = '';
 
         var fragment = document.createDocumentFragment();
 
-        for (var j = 0; j < window.photos[i].comments.length; j++) {
-          fragment.appendChild(createComment(window.photos[i], j));
+        for (var j = 0; j < window.data.photos[i].comments.length; j++) {
+          fragment.appendChild(createComment(window.data.photos[i], j));
         }
 
         openedPhotoComments.appendChild(fragment);
