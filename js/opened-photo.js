@@ -29,13 +29,16 @@
     return comment;
   }
 
+  // Обработчик события клика/нажатия Enter на миниатюру
   function onPhotoClick(evt) {
+
     if (evt.target.classList.contains('picture__img') || evt.target.classList.contains('picture')) {
       evt.preventDefault();
       openPhoto(evt.target);
     }
   }
 
+  // Закрывает увеличенное изображение
   function closePhoto() {
     openedPhoto.classList.add('hidden');
 
@@ -45,14 +48,17 @@
     document.addEventListener('click', onPhotoClick);
   }
 
+  // Обработчик нажатия на кнопку закрытия увеличенного изображения
   function onPhotoCancelClick() {
     closePhoto();
   }
 
+  // Обработчик нажатия на "Escape" при открытом увеличенном изображении
   function onOpenedPhotoEscapePress(evt) {
     window.util.isEscEvent(evt, closePhoto);
   }
 
+  // Показывает увеличенное фото
   function openPhoto(photo) {
     var currentPhoto;
 
