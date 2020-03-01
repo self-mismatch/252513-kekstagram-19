@@ -76,5 +76,5 @@
 
   window.data = {
     photos: photos
-  }
+  };
 })();
