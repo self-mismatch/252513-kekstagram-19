@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var DEFAULT_SCALE = '100%';
+
   var body = document.body;
 
   var imgUpload = document.querySelector('.img-upload');
@@ -43,6 +45,11 @@
 
     window.sliderWidth = document.querySelector('.effect-level__line').offsetWidth;
     window.pinWidth = document.querySelector('.effect-level__pin').offsetWidth;
+
+    window.leftEdge = -window.pinWidth / 2;
+    window.rightEdge = window.sliderWidth - window.pinWidth / 2;
+
+    slider.classList.add('effect-level--hidden');
   }
 
   // Скрывает форму редактирования изображения и удаляет все обработчики внутренних элементов
@@ -167,6 +174,10 @@
     imgUploadPreview.style.transform = 'scale(' + value / 100 + ')';
   }
 
+  var slider = document.querySelector('.img-upload__effect-level');
+  var sliderLine = slider.querySelector('.effect-level__depth');
+  var pin = slider.querySelector('.effect-level__pin');
+
   // Удаляет фильтры с фотографии
   function deleteImgFilters() {
     imgUploadPreview.removeAttribute('style');
@@ -174,17 +185,41 @@
   }
 
   // Меняет фильтр на фотографии
-  function changeimgFilter(filter) {
+  function changeImgFilter(filter) {
     deleteImgFilters();
+
     imgUploadPreview.classList.add(filter);
+  }
+
+  // Сбрасывает фильтр и ползунок к начальным значениям
+  function makeDefaultImg() {
+    deleteImgFilters();
+
+    scaleControlValue.value = DEFAULT_SCALE;
+
+    pin.style.left = window.rightEdge + 'px';
+    sliderLine.style.width = '100%';
   }
 
   // Обрабатывает смену фильтров и применяет выбранный фильтр на фотографию
   function onImgFilterChange(evt) {
 
     if (evt.target.classList.contains('effects__radio')) {
-      changeimgFilter('effects__preview--' + evt.target.value);
-      window.activeFilter = evt.target.value;
+      makeDefaultImg();
+
+      if (evt.target.value !== 'none') {
+
+        if (slider.classList.contains('effect-level--hidden')) {
+          slider.classList.remove('effect-level--hidden');
+        }
+
+        if (evt.target.classList.contains('effects__radio')) {
+          changeImgFilter('effects__preview--' + evt.target.value);
+          window.activeFilter = evt.target.value;
+        }
+      } else {
+        slider.classList.add('effect-level--hidden');
+      }
     }
   }
 })();

@@ -571,6 +571,10 @@ main {
           transform: translateX(-50%);
 }
 
+.effect-level--hidden {
+  display: none;
+}
+
 .effect-level__value {
   display: none;
 }

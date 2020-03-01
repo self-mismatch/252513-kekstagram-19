@@ -41,9 +41,6 @@
     var sliderWidth = window.sliderWidth;
     var pinWidth = window.pinWidth;
 
-    var leftEdge = -pinWidth / 2;
-    var rightEdge = sliderWidth - pinWidth / 2;
-
     var startX = downEvt.clientX;
     var shiftX = startX - pin.getBoundingClientRect().left;
 
@@ -54,10 +51,10 @@
 
       var leftMove = moveEvt.clientX - shiftX - slider.getBoundingClientRect().left;
 
-      if (leftMove <= leftEdge) {
-        leftMove = leftEdge;
-      } else if (leftMove >= rightEdge) {
-        leftMove = rightEdge;
+      if (leftMove <= window.leftEdge) {
+        leftMove = window.leftEdge;
+      } else if (leftMove >= window.rightEdge) {
+        leftMove = window.rightEdge;
       }
 
       pin.style.left = leftMove + 'px';
