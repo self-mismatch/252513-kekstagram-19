@@ -4,27 +4,47 @@
   var photoTemplate = document.querySelector('#picture').content.querySelector('.picture');
 
   // Возвращает готовый для вставки DOM-элемент - фото, с заполненными данными
-  function renderPhoto(photo) {
-    var photoElement = photoTemplate.cloneNode(true);
+  function getCompletedPhoto(photoData) {
+    var photo = photoTemplate.cloneNode(true);
 
-    photoElement.querySelector('.picture__img').src = photo.url;
-    photoElement.querySelector('.picture__comments').textContent = photo.comments.length;
-    photoElement.querySelector('.picture__likes').textContent = photo.likes;
+    photo.querySelector('.picture__img').src = photoData.url;
+    photo.querySelector('.picture__comments').textContent = photoData.comments.length;
+    photo.querySelector('.picture__likes').textContent = photoData.likes;
 
-    return photoElement;
+    return photo;
   }
 
   var fragment = document.createDocumentFragment();
 
   // Выводит на экран фотографии из массива
-  function renderPhotoElements() {
-    for (var i = 0; i < window.data.photos.length; i++) {
-      fragment.appendChild(renderPhoto(window.data.photos[i]));
+  function renderPhotos(photos) {
+    for (var i = 0; i < photos.length; i++) {
+      fragment.appendChild(getCompletedPhoto(photos[i]));
     }
   }
 
-  renderPhotoElements();
+  // Выводит на экран сообщение с ошибкой
+  function renderErrorMessage(errorMessage) {
+    var errorBlock = document.createElement('div');
 
-  var picturesList = document.querySelector('.pictures');
-  picturesList.appendChild(fragment);
+    errorBlock.style = 'position: absolute; z-index: 100; top: 0; right: 0; left: 0; margin: 0; padding: 5px; font-size: 14px; text-align: center; color: white; background-color: red;';
+    errorBlock.textContent = errorMessage;
+
+    document.body.insertAdjacentElement('afterbegin', errorBlock);
+  }
+
+  // Обработчик успешной загрузки фотографий
+  function onPhotosLoadSuccess(photos) {
+    renderPhotos(photos);
+
+    var picturesList = document.querySelector('.pictures');
+    picturesList.appendChild(fragment);
+  }
+
+  // Обработчик неуспешной загрузки фотографий
+  function onPhotosLoadError(errorMessage) {
+    renderErrorMessage(errorMessage);
+  }
+
+  window.backend.load(onPhotosLoadSuccess, onPhotosLoadError);
 })();
