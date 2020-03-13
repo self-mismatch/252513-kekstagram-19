@@ -222,4 +222,23 @@
       }
     }
   }
+
+  function onPhotoUploadSuccess() {
+    closeImgEditor();
+    window.uploadStatus('success');
+  }
+
+  function onPhotoUploadError() {
+    closeImgEditor();
+    window.uploadStatus('error');
+  }
+
+  // Обработчик отправки формы на сервер
+  function onImgFormSubmit(evt) {
+    evt.preventDefault();
+
+    window.backend.uploadPhoto(new FormData(imgUploadForm), onPhotoUploadSuccess, onPhotoUploadError);
+  }
+
+  imgUploadForm.addEventListener('submit', onImgFormSubmit);
 })();

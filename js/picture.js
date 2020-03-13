@@ -23,16 +23,6 @@
     }
   }
 
-  // Выводит на экран сообщение с ошибкой
-  function renderErrorMessage(errorMessage) {
-    var errorBlock = document.createElement('div');
-
-    errorBlock.style = 'position: absolute; z-index: 100; top: 0; right: 0; left: 0; margin: 0; padding: 5px; font-size: 14px; text-align: center; color: white; background-color: red;';
-    errorBlock.textContent = errorMessage;
-
-    document.body.insertAdjacentElement('afterbegin', errorBlock);
-  }
-
   // Обработчик успешной загрузки фотографий
   function onPhotosLoadSuccess(photos) {
     renderPhotos(photos);
@@ -43,8 +33,8 @@
 
   // Обработчик неуспешной загрузки фотографий
   function onPhotosLoadError(errorMessage) {
-    renderErrorMessage(errorMessage);
+    window.util.renderError(errorMessage);
   }
 
-  window.backend.load(onPhotosLoadSuccess, onPhotosLoadError);
+  window.backend.loadPhoto(onPhotosLoadSuccess, onPhotosLoadError);
 })();
