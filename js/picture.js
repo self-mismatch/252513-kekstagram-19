@@ -2,6 +2,7 @@
 
 (function () {
   var photoTemplate = document.querySelector('#picture').content.querySelector('.picture');
+  var imgFilters = document.querySelector('.img-filters');
 
   // Возвращает готовый для вставки DOM-элемент - фото, с заполненными данными
   function getCompletedPhoto(photoData) {
@@ -14,21 +15,25 @@
     return photo;
   }
 
-  var fragment = document.createDocumentFragment();
-
   // Выводит на экран фотографии из массива
   function renderPhotos(photos) {
+    var fragment = document.createDocumentFragment();
+    var picturesList = document.querySelector('.pictures');
+
     for (var i = 0; i < photos.length; i++) {
       fragment.appendChild(getCompletedPhoto(photos[i]));
     }
+
+    picturesList.appendChild(fragment);
   }
 
   // Обработчик успешной загрузки фотографий
   function onPhotosLoadSuccess(photos) {
     renderPhotos(photos);
 
-    var picturesList = document.querySelector('.pictures');
-    picturesList.appendChild(fragment);
+    imgFilters.classList.remove('img-filters--inactive');
+
+    window.picture.pictures = photos.slice();
   }
 
   // Обработчик неуспешной загрузки фотографий
@@ -37,4 +42,8 @@
   }
 
   window.backend.loadPhoto(onPhotosLoadSuccess, onPhotosLoadError);
+
+  window.picture = {
+    renderPhotos: renderPhotos
+  };
 })();

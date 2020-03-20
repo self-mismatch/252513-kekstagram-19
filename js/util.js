@@ -22,6 +22,9 @@
       errorBlock.textContent = errorMessage;
 
       document.body.insertAdjacentElement('afterbegin', errorBlock);
+    },
+    getRandomNumber: function (min, max) {
+      return Math.floor(min - min + Math.random() * (max + 1 - min));
     }
   };
 })();
