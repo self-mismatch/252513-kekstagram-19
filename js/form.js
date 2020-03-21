@@ -109,7 +109,6 @@
   // Обработчик нажатия на Escape при открытой форме редактирования изображения
   function onImgEditorEscPress(evt) {
 
-    // FIXME: Не всегда срабатывает закрытие формы обработки при нажатии на esc
     if (!hasHashtagsFocus && !hasCommentFocus) {
       window.util.isEscEvent(evt, closeImgEditor);
     }
@@ -125,7 +124,6 @@
     }
   }
 
-  // FIXME: Не всегда срабатывает закрытие формы обработки при нажатии на esc
   // Обработчик состояния фокуса на поле с хеш-тегами
   function onHashtagsFocus() {
     toggleFocusState(hasHashtagsFocus, true);
