@@ -11,7 +11,6 @@
   var sliderLine = slider.querySelector('.effect-level__depth');
 
   function changeFilterSaturation(value) {
-
     switch (window.activeFilter) {
       case 'chrome':
         imgUpload.style.filter = 'grayscale(' + value + ')';

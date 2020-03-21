@@ -25,6 +25,8 @@
     }
 
     picturesList.appendChild(fragment);
+
+    window.picture.pictures = photos.slice();
   }
 
   // Обработчик успешной загрузки фотографий
@@ -32,8 +34,6 @@
     renderPhotos(photos);
 
     imgFilters.classList.remove('img-filters--inactive');
-
-    window.picture.pictures = photos.slice();
   }
 
   // Обработчик неуспешной загрузки фотографий
@@ -43,7 +43,5 @@
 
   window.backend.loadPhoto(onPhotosLoadSuccess, onPhotosLoadError);
 
-  window.picture = {
-    renderPhotos: renderPhotos
-  };
+  window.picture.renderPhotos = renderPhotos;
 })();

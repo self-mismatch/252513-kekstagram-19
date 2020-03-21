@@ -203,12 +203,10 @@
 
   // Обрабатывает смену фильтров и применяет выбранный фильтр на фотографию
   function onImgFilterChange(evt) {
-
     if (evt.target.classList.contains('effects__radio')) {
       makeDefaultImg();
 
       if (evt.target.value !== 'none') {
-
         if (slider.classList.contains('effect-level--hidden')) {
           slider.classList.remove('effect-level--hidden');
         }
