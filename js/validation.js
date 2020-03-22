@@ -1,5 +1,9 @@
 'use strict';
 (function () {
+  var HASHTAGS_MAX_AMOUNT = 5;
+  var HASHTAG_MAX_LENGTH = 20;
+  var HASHTAG_MIN_LENGTH = 2;
+
   var imgUploadForm = document.querySelector('.img-upload__form');
   var imgUploadText = imgUploadForm.querySelector('.img-upload__text');
   var hashtagsInput = imgUploadText.querySelector('.text__hashtags');
@@ -33,11 +37,7 @@
     hashtagsInput.setCustomValidity('');
 
     Object.keys(hashtagsValidity).forEach(function (key) {
-      if (key === 'hasSimilarHashtags') {
-        hashtagsValidity[key] = false;
-      } else {
-        hashtagsValidity[key] = true;
-      }
+      hashtagsValidity[key] = key === 'hasSimilarHashtags' ? false : true;
     });
   }
 
@@ -79,31 +79,30 @@
 
       var errorMessage = '';
 
-      if (hashtags.length > 5) {
-        errorMessage += 'Нельзя указать больше 5 хештегов; ';
+      if (hashtags.length > HASHTAGS_MAX_AMOUNT) {
+        errorMessage += 'Нельзя указать больше ' + HASHTAGS_MAX_AMOUNT + ' хештегов;';
       }
 
-      for (var i = 0; i < hashtags.length; i++) {
-
-        if (hashtags[i].length === 0 && hashtagsValidity.hasOneSpace) {
+      hashtags.forEach(function (hashtag, i) {
+        if (hashtag.length === 0 && hashtagsValidity.hasOneSpace) {
           errorMessage += 'Хеш-теги должны разделяться одним пробелом; ';
           hashtagsValidity.hasOneSpace = false;
         }
 
-        if (hashtags[i].length > 20 && hashtagsValidity.hasAuthorizedLength) {
-          errorMessage += 'Максимальная длина одного хеш-тега, включая символ "#", 20 символов; ';
+        if (hashtag.length > HASHTAG_MAX_LENGTH && hashtagsValidity.hasAuthorizedLength) {
+          errorMessage += 'Максимальная длина одного хеш-тега, включая символ "#", ' + HASHTAG_MAX_LENGTH + ' символов; ';
           hashtagsValidity.hasAuthorizedLength = false;
         }
 
-        if (!checkHashtagWithPattern(hashtags[i]) && hashtagsValidity.hasAuthorizedSymbols && hashtags[i].length > 1) {
+        if (!checkHashtagWithPattern(hashtag) && hashtagsValidity.hasAuthorizedSymbols && hashtag.length >= HASHTAG_MIN_LENGTH) {
           errorMessage += 'Хеш-теги могут состоять только из букв, чисел и символа "#" в начале; ';
           hashtagsValidity.hasAuthorizedSymbols = false;
         }
 
-        if (!checkForHash(hashtags[i]) && hashtagsValidity.hasFirstHash) {
+        if (!checkForHash(hashtag) && hashtagsValidity.hasFirstHash) {
           errorMessage += 'Хеш-теги должны начинаться с символа "#"; ';
           hashtagsValidity.hasFirstHash = false;
-        } else if (checkForHash(hashtags[i]) && hashtags[i].length === 1) {
+        } else if (checkForHash(hashtag) && hashtag.length < HASHTAG_MIN_LENGTH) {
           errorMessage += 'Хеш-тег не может состоять только из одной решётки; ';
         }
 
@@ -111,7 +110,7 @@
           errorMessage += 'Хеш-теги не могут повторяться; ';
           hashtagsValidity.hasSimilarHashtags = true;
         }
-      }
+      });
 
       hashtagsInput.setCustomValidity(errorMessage);
     }

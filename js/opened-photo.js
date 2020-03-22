@@ -1,16 +1,22 @@
 'use strict';
 
 (function () {
+  var COMMENTS_PER_CLICK = 5;
+
+  var body = document.body;
+
   var openedPhoto = document.querySelector('.big-picture');
   var openedPhotoCancel = openedPhoto.querySelector('.big-picture__cancel');
   var openedPhotoImg = openedPhoto.querySelector('.big-picture__img img');
 
-  var openedPhotoSocial = openedPhoto.querySelector('.big-picture__social');
-  var openedPhotoCaption = openedPhotoSocial.querySelector('.social__caption');
-  var openedPhotoLikes = openedPhotoSocial.querySelector('.likes-count');
+  var openedPhotoSocial = openedPhoto.querySelector('.social');
   var openedPhotoComments = openedPhotoSocial.querySelector('.social__comments');
+  var openedPhotoCommentsCount = openedPhotoSocial.querySelector('.social__comment-count');
+  var openedPhotoDescription = openedPhotoSocial.querySelector('.social__caption');
+  var openedPhotoLikesCount = openedPhotoSocial.querySelector('.likes-count');
 
   var commentTemplate = openedPhotoComments.querySelector('.social__comment');
+  var commentsLoader = openedPhotoSocial.querySelector('.comments-loader');
 
   // Возвращает комментарий с параметрами, заданными в передающемся элементе массива с фотографиями
   function getComment(photo, commentIndex) {
@@ -28,46 +34,47 @@
 
   // Отображает комментарии в окне увеличенной фотографии
   function renderComments(photo, amount, startCommentsIndex) {
-    var photosList = document.querySelectorAll('.picture');
-    var fragment = document.createDocumentFragment();
+    if (photo.comments.length > startCommentsIndex) {
+      var allCommentsAmount = photo.comments.length;
+      var renderedCommentsAmount = startCommentsIndex;
+      var notRenderedCommentsAmount = allCommentsAmount - renderedCommentsAmount;
 
-    var renderedCommentsAmount = 0;
-    var photoCommentsAmount = photo.parentNode.querySelector('.picture__comments').textContent;
-    var commentsAmount = photoCommentsAmount - startCommentsIndex;
+      var commentsToRenderAmount = 0;
 
-    for (var i = 0; i < photosList.length; i++) {
-      if (photosList[i] === photo.parentElement) {
-        openedPhotoCaption.textContent = window.picture.pictures[i].description;
-        openedPhotoLikes.textContent = window.picture.pictures[i].likes;
+      if (notRenderedCommentsAmount > amount) {
+        commentsToRenderAmount = amount;
+      } else {
+        commentsToRenderAmount = notRenderedCommentsAmount;
 
-        var commentsCount = 0;
-
-        if (commentsAmount >= amount) {
-          commentsCount = amount;
-        } else {
-          commentsCount = commentsAmount;
-        }
-
-        if (commentsAmount > 0) {
-          for (var j = 0; j < commentsCount; j++) {
-            fragment.appendChild(getComment(window.picture.pictures[i], j));
-          }
-        }
-
-        renderedCommentsAmount += commentsCount;
-
-        commentsAmount -= amount;
-
-        openedPhotoComments.appendChild(fragment);
+        commentsLoader.classList.add('hidden');
       }
-    }
 
-    return renderedCommentsAmount;
+      var fragment = document.createDocumentFragment();
+
+      for (var i = 0; i < commentsToRenderAmount; i++) {
+        fragment.appendChild(getComment(photo, i));
+        renderedCommentsAmount++;
+      }
+
+      openedPhotoComments.appendChild(fragment);
+
+      var commentsCountWord = allCommentsAmount % 10 === 1 ? 'комментария' : 'комментариев';
+
+      var commentsCount = renderedCommentsAmount + ' из ' + allCommentsAmount + ' ' + commentsCountWord;
+      openedPhotoCommentsCount.textContent = commentsCount;
+
+      return renderedCommentsAmount;
+    } else {
+      return 0;
+    }
   }
 
   // Закрывает увеличенное изображение
   function closePhoto() {
+    body.classList.remove('modal-open');
+
     openedPhoto.classList.add('hidden');
+    commentsLoader.classList.remove('hidden');
 
     openedPhotoCancel.removeEventListener('click', onPhotoCancelClick);
     document.removeEventListener('keydown', onOpenedPhotoEscapePress);
@@ -76,7 +83,9 @@
   }
 
   // Показывает увеличенное фото
-  function renderBigPhoto(photo) {
+  function openPhoto(photo) {
+    body.classList.add('modal-open');
+
     var clickedPhoto;
 
     if (photo.classList.contains('picture__img')) {
@@ -85,7 +94,23 @@
       clickedPhoto = photo.querySelector('.picture__img');
     }
 
-    openedPhotoImg.src = clickedPhoto.src;
+    var photoInfo = clickedPhoto.parentElement;
+    var photoSource = clickedPhoto.getAttribute('src');
+    var photoCommentsAmount = parseInt(photoInfo.querySelector('.picture__comments').textContent, 10);
+    var photoLikesAmount = parseInt(photoInfo.querySelector('.picture__likes').textContent, 10);
+
+    var photos = window.picture.pictures.slice();
+
+    for (var i = 0; i < photos.length; i++) {
+      if (photoSource === photos[i].url && photoCommentsAmount === photos[i].comments.length && photoLikesAmount === photos[i].likes) {
+        clickedPhoto = photos[i];
+        break;
+      }
+    }
+
+    openedPhotoImg.src = clickedPhoto.url;
+    openedPhotoDescription.textContent = clickedPhoto.description;
+    openedPhotoLikesCount.textContent = clickedPhoto.likes;
     openedPhotoComments.innerHTML = '';
 
     var renderedCommentsAmount = renderComments(clickedPhoto, 5, 0);
@@ -99,21 +124,34 @@
 
     // Обработчик клика на кнопку "Загрузить еще", для отображения дополнительных комментариев
     function onCommentsLoaderClick() {
-      renderComments(clickedPhoto, 5, renderedCommentsAmount);
+      renderComments(clickedPhoto, COMMENTS_PER_CLICK, renderedCommentsAmount);
 
-      renderedCommentsAmount += 5;
+      renderedCommentsAmount += COMMENTS_PER_CLICK;
     }
 
-    var commentsLoader = openedPhotoSocial.querySelector('.comments-loader');
     commentsLoader.addEventListener('click', onCommentsLoaderClick);
   }
+
+  var commentInput = openedPhotoSocial.querySelector('.social__footer-text');
+  var hasCommentInputFocus = false;
+
+  function onCommentInputFocus() {
+    hasCommentInputFocus = true;
+  }
+
+  function onCommentInputBlur() {
+    hasCommentInputFocus = false;
+  }
+
+  commentInput.addEventListener('focus', onCommentInputFocus);
+  commentInput.addEventListener('blur', onCommentInputBlur);
 
   // Обработчик события клика/нажатия Enter на миниатюру
   function onPhotoClick(evt) {
     if (evt.target.classList.contains('picture__img') || evt.target.classList.contains('picture')) {
       evt.preventDefault();
 
-      renderBigPhoto(evt.target);
+      openPhoto(evt.target);
     }
   }
 
@@ -124,7 +162,9 @@
 
   // Обработчик нажатия на "Escape" при открытом увеличенном изображении
   function onOpenedPhotoEscapePress(evt) {
-    window.util.isEscEvent(evt, closePhoto);
+    if (!hasCommentInputFocus) {
+      window.util.isEscEvent(evt, closePhoto);
+    }
   }
 
   document.addEventListener('click', onPhotoClick);

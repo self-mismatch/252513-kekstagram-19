@@ -1,7 +1,10 @@
 'use strict';
 
 (function () {
-  var DEFAULT_SCALE = '100%';
+  var SCALE_DEFAULT = '100%';
+  var SCALE_STEP = 25;
+  var SCALE_MAX = 100;
+  var SCALE_MIN = 25;
 
   var body = document.body;
 
@@ -18,9 +21,6 @@
   var imgUploadText = imgEditor.querySelector('.img-upload__text');
   var imgHashtags = imgUploadText.querySelector('.text__hashtags');
   var imgComment = imgUploadText.querySelector('.text__description');
-
-  var hasHashtagsFocus = false;
-  var hasCommentFocus = false;
 
   // Показывает форму редактирования изображения и вешает обработчики на внутренние элементы
   function openImgEditor() {
@@ -74,6 +74,7 @@
     uploadFile.addEventListener('change', onImgUploadChange);
 
     deleteImgFilters();
+    makeDefaultScale();
     resetUploadFile();
   }
 
@@ -83,9 +84,9 @@
     var fileSrc = window.URL.createObjectURL(file);
     imgUploadPreview.src = fileSrc;
 
-    for (var i = 0; i < effectsPreviews.length; i++) {
-      effectsPreviews[i].style.backgroundImage = 'url("' + fileSrc + '")';
-    }
+    Array.from(effectsPreviews).forEach(function (effectsPreview) {
+      effectsPreview.style.backgroundImage = 'url("' + fileSrc + '")';
+    });
   }
 
   // Обработчик нажатия на кнопку загрузки изображения
@@ -106,42 +107,34 @@
     resizeImg('+');
   }
 
-  // Обработчик нажатия на Escape при открытой форме редактирования изображения
-  function onImgEditorEscPress(evt) {
-
-    if (!hasHashtagsFocus && !hasCommentFocus) {
-      window.util.isEscEvent(evt, closeImgEditor);
-    }
-  }
-
-  // Меняет логическое значение переменной на противоположное при фокусе/снятии фокуса
-  function toggleFocusState(input, state) {
-
-    if (input === hasHashtagsFocus) {
-      hasHashtagsFocus = state;
-    } else {
-      hasCommentFocus = state;
-    }
-  }
+  var hasHashtagsFocus = false;
+  var hasCommentFocus = false;
 
   // Обработчик состояния фокуса на поле с хеш-тегами
   function onHashtagsFocus() {
-    toggleFocusState(hasHashtagsFocus, true);
+    hasHashtagsFocus = true;
   }
 
   // Обработчик состояния потери фокуса с поля с хеш-тегами
   function onHashtagsBlur() {
-    toggleFocusState(hasHashtagsFocus, false);
+    hasHashtagsFocus = false;
   }
 
   // Обработчик состояния фокуса на поле с комментарием
   function onCommentFocus() {
-    toggleFocusState(hasCommentFocus, true);
+    hasCommentFocus = true;
   }
 
   // Обработчик состояния потери фокуса с поля с комментарием
   function onCommentBlur() {
-    toggleFocusState(hasCommentFocus, false);
+    hasCommentFocus = false;
+  }
+
+  // Обработчик нажатия на Escape при открытой форме редактирования изображения
+  function onImgEditorEscPress(evt) {
+    if (!hasHashtagsFocus && !hasCommentFocus) {
+      window.util.isEscEvent(evt, closeImgEditor);
+    }
   }
 
   // Сбрасывает значение инпута загрузки файла и возвращает дефолтное изображение
@@ -149,9 +142,9 @@
     uploadFile.value = '';
     imgUploadPreview.src = 'img/upload-default-image.jpg';
 
-    for (var i = 0; i < effectsPreviews.length; i++) {
-      effectsPreviews[i].removeAttribute('style');
-    }
+    Array.from(effectsPreviews).forEach(function (effectsPreview) {
+      effectsPreview.removeAttribute('style');
+    });
   }
 
   var scaleControlSmall = imgEditor.querySelector('.scale__control--smaller');
@@ -162,10 +155,10 @@
   function resizeImg(operator) {
     var value = parseInt(scaleControlValue.value, 10);
 
-    if (value < 100 && operator === '+') {
-      value += 25;
-    } else if (value > 25 && operator === '-') {
-      value -= 25;
+    if (value < SCALE_MAX && operator === '+') {
+      value += SCALE_STEP;
+    } else if (value > SCALE_MIN && operator === '-') {
+      value -= SCALE_STEP;
     }
 
     scaleControlValue.value = value + '%';
@@ -178,7 +171,6 @@
 
   // Удаляет фильтры с фотографии
   function deleteImgFilters() {
-    imgUploadPreview.removeAttribute('style');
     imgUploadPreview.removeAttribute('class');
   }
 
@@ -189,11 +181,15 @@
     imgUploadPreview.classList.add(filter);
   }
 
+  // Возвращает параметр масштаба фотографии к дефолтному значению
+  function makeDefaultScale() {
+    scaleControlValue.value = SCALE_DEFAULT;
+    imgUploadPreview.removeAttribute('style');
+  }
+
   // Сбрасывает фильтр и ползунок к начальным значениям
   function makeDefaultImg() {
     deleteImgFilters();
-
-    scaleControlValue.value = DEFAULT_SCALE;
 
     pin.style.left = window.rightEdge + 'px';
     sliderLine.style.width = '100%';
@@ -233,7 +229,7 @@
   function onImgFormSubmit(evt) {
     evt.preventDefault();
 
-    window.backend.uploadPhoto(new FormData(imgUploadForm), onPhotoUploadSuccess, onPhotoUploadError);
+    window.backend.uploadPhoto(new FormData(imgUploadForm), 'POST', onPhotoUploadSuccess, onPhotoUploadError);
   }
 
   imgUploadForm.addEventListener('submit', onImgFormSubmit);

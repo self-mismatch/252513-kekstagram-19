@@ -15,18 +15,29 @@
     return photo;
   }
 
-  // Выводит на экран фотографии из массива
+  var isAllPhotoUploaded = false;
+
+  // Сохраняет в глобальной области видимости загруженные фотографии с сервера
+  function saveUploadedPhotos(photos) {
+    if (!isAllPhotoUploaded) {
+      window.picture.pictures = photos.slice();
+
+      isAllPhotoUploaded = !isAllPhotoUploaded;
+    }
+  }
+
+  // Выводит на экран фотографии
   function renderPhotos(photos) {
     var fragment = document.createDocumentFragment();
     var picturesList = document.querySelector('.pictures');
 
-    for (var i = 0; i < photos.length; i++) {
-      fragment.appendChild(getCompletedPhoto(photos[i]));
-    }
+    photos.forEach(function (photo) {
+      fragment.appendChild(getCompletedPhoto(photo));
+    });
 
     picturesList.appendChild(fragment);
 
-    window.picture.pictures = photos.slice();
+    saveUploadedPhotos(photos);
   }
 
   // Обработчик успешной загрузки фотографий
@@ -41,7 +52,7 @@
     window.util.renderError(errorMessage);
   }
 
-  window.backend.loadPhoto(onPhotosLoadSuccess, onPhotosLoadError);
+  window.backend.loadPhotos('', 'GET', onPhotosLoadSuccess, onPhotosLoadError);
 
   window.picture.renderPhotos = renderPhotos;
 })();

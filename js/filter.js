@@ -6,18 +6,20 @@
 
   // Удаляет все изображения
   function deletePictures(pictures) {
-    for (var i = 0; i < pictures.length; i++) {
-      pictures[i].parentNode.removeChild(pictures[i]);
-    }
+    Array.from(pictures).forEach(function (picture) {
+      picture.parentNode.removeChild(picture);
+    });
   }
 
   // Меняет активную кнопку фильтров изображений
-  function changeActiveFilterButton(button) {
-    for (var i = 0; i < filters.length; i++) {
-      if (button !== filters[i]) {
-        filters[i].classList.remove('img-filters__button--active');
+  function changeActiveFilterButton(clickedButton) {
+    Array.from(filters).forEach(function (currentButton) {
+      if (clickedButton !== currentButton) {
+        return currentButton.classList.remove('img-filters__button--active');
+      } else {
+        return currentButton;
       }
-    }
+    });
   }
 
   // Меняет фильтр изображений
@@ -32,7 +34,7 @@
     var photos = [];
 
     if (current.id === 'filter-default') {
-      photos = picturesArray;
+      photos = picturesArray.slice();
     } else if (current.id === 'filter-random') {
       var uniquePhotos = picturesArray.slice();
 
@@ -44,9 +46,8 @@
         uniquePhotos.splice(randomIndex, 1);
       }
     } else if (current.id === 'filter-discussed') {
-      var mostDiscussedPhotos = picturesArray.slice();
-      mostDiscussedPhotos.sort(function (first, second) {
-        return second.likes - first.likes;
+      var mostDiscussedPhotos = picturesArray.slice().sort(function (first, second) {
+        return second.comments.length - first.comments.length;
       });
 
       photos = mostDiscussedPhotos.slice();
